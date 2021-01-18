@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "G+W3G19jE4HdTR3YAn/GmOSkDDXNEYG7YCHKZPQcbocV2NEpLMMWiVfNJElJNRJQuJE3/ET3zbWRUQpYHrHrEg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\cydev\\source\\repos\\Disclosers Monitor\\Disclosers Monitor.Core\\Disclosers Monitor.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\cydev\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\cydev\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\cydev\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
