@@ -5,7 +5,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Disclosers_Monitor.Core.Models;
 using Disclosers_Monitor.Core.Services;
 using Disclosers_Monitor.Services;
@@ -24,15 +25,16 @@ namespace Disclosers_Monitor.Views
         public ActiveBandsPage()
         {
             InitializeComponent();
+           
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             // TODO WTS: Replace this with your actual data
 
-            
+
             DataGrid dt = new DataGrid();
         }
 
@@ -52,52 +54,134 @@ namespace Disclosers_Monitor.Views
         private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
-        private void getLength(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void getLength(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            string[] coordinates = { "X", "Y", "Z", "V" };
-            Dictionary<int, Dictionary<string, int>> dataDict = new Dictionary<int, Dictionary<string, int>>();
-            for(int i = 1; i <= Int32.Parse(crossbase.getData("max_amount")); i++)
-            {
-                Dictionary<string, int> data = new Dictionary<string, int>();
-                foreach(var coordinate in coordinates)
-                {
-                    string v = "id-" + i.ToString() + "-";
-                    data.Add(coordinate, int.Parse(crossbase.getData(v + coordinate)));
-                }
-                dataDict.Add(i, data);
-            }
-            double rssi = calculateRSSI(dataDict[1], dataDict[2]);
-            double distance = toDistance(rssi);
-            if(distance < 1)
-            {
-                crossbase.setData("id-1-vibrate", "true");
-                crossbase.setData("id-2-vibrate", "true");
-
-            }
-            LengthBox.Text = distance.ToString();
+            
+            await BackgroundCalulating();
+           
 
         }
         public double toDistance(double rssi)
         {
             double distance = 0;
-            double power10 = 0;
+            rssi = -rssi-6;
+            double rssi2 = rssi * rssi;
+            double rssi3 = rssi2 * rssi;
+            double rssi4 = rssi3 * rssi;
+            double rssi5 = rssi4 * rssi;
 
-            power10 = (rssi - 20 * Math.Log10((4 * 3.14 * 1) / (0.125))) / (10 * 1.7);
-            distance = Math.Pow(10, power10);
+            distance = (-0.043 * rssi5 - 4.92 * rssi4 - 171.5 * rssi3 - 600.8 * rssi2 + 41.41 * rssi - 0.84) / (rssi4 + 250.4 * rssi3 + 14780 * rssi2 - 455.9 * rssi + 12.24);
 
             return distance;
         }
         public double calculateRSSI(Dictionary<string, int> bandOne, Dictionary<string, int> bandTwo)
         {
-            double rssi = 0;
-            int bX = bandOne["X"] - bandTwo["X"];
-            int bY = bandOne["Y"] - bandTwo["Y"];
-            int bZ = bandOne["Z"] - bandTwo["Z"];
-            int bV = bandOne["V"] - bandTwo["V"];
+
+            double[] a = triangularSystem(bandOne);
+            double[] b = triangularSystem(bandTwo);
+
+            double l = Math.Sqrt(Math.Pow(a[0] - b[0], 2) + Math.Pow(a[1] - b[1], 2));
+
+            return l;
+        }
+
+        public double[] triangularSystem(Dictionary<string, int> band)
+        {
+            double r1 = toDistance(band["X"]);
+            double r2 = toDistance(band["Y"]);
+            double r3 = toDistance(band["Z"]);
+            double x2 = 2;
+            double y3 = 3.5;
+            double x3 = 1;
+
+            double x = (r1 * r1 - r2 * r2 + x2 * x2) /( 2 * x2);
+            double y = (r1 * r1 - r3 * r3 + x3 * x3 + y3 * y3 - 2 * x * x3) / (2 * y3);
+
+            double[] coordinates = { x, y };
+
+            return coordinates;
+        }
+
+        public async Task BackgroundCalulating()
+        {
+            while (true)
+            {
+                Dictionary<int, Dictionary<string, int>> dataDict = await Average();
+                double rssi = calculateRSSI(dataDict[1], dataDict[2]);
+                if (rssi <  int.Parse(crossbase.getData("min_distance")))
+                {
+                    crossbase.setData("id-1-vibrate", "true");
+                    crossbase.setData("id-2-vibrate", "true");
+
+                }
+                
+                LengthBox.Text = (rssi*10).ToString();
+            }
             
-            rssi = Math.Pow(bX, 2 )+ Math.Pow(bY, 2)+ Math.Pow(bZ, 2)+ Math.Pow(bV, 2);
-            rssi = Math.Sqrt(rssi);
-            return rssi;
+
+            
+        }
+        public async Task<Dictionary<int, Dictionary<string, int>>> Average()
+        {
+            string[] coordinates = { "X", "Y", "Z" };
+            Dictionary<int, Dictionary<string, int>> dataDict = new Dictionary<int, Dictionary<string, int>>();
+            
+            await Task.Run(()=>
+            {
+                
+                double times = 1;
+                int max_amount = Int32.Parse(crossbase.getData("max_amount"));
+                for (int j = 0; j < times; j++)
+                {
+                    for (int i = 1; i <= max_amount; i++)
+                    {
+                        if (j == 0)
+                        {
+                            Dictionary<string, int> data = new Dictionary<string, int>();
+                            foreach (var coordinate in coordinates)
+                            {
+                                string v = "id-" + i.ToString() + "-";
+                                data.Add(coordinate, int.Parse(crossbase.getData(v + coordinate)));
+                            }
+                            dataDict.Add(i, data);
+                        }
+                        else
+                        {
+                            foreach (var data in dataDict)
+                            {
+                                var d = data.Value;
+                                foreach (var coordinate in coordinates)
+                                {
+                                    string v = "id-" + i.ToString() + "-";
+                                    d[coordinate] += int.Parse(crossbase.getData(v + coordinate));
+
+                                }
+                            }
+                        }
+
+                    }
+                }
+                for (int i = 1; i <= max_amount; ++i)
+                {
+                    foreach (var data in dataDict)
+                    {
+                        var d = data.Value;
+                        foreach (var coordinate in coordinates)
+                        {
+                            string v = "id-" + i.ToString() + "-";
+                            d[coordinate] = (int)(d[coordinate] / times);
+
+                        }
+                    }
+                }
+            }
+
+            );
+
+            await Task.Delay(5000);
+
+
+            return dataDict;
         }
     }
 }

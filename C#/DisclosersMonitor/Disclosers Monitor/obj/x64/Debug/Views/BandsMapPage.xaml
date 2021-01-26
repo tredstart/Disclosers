@@ -6,6 +6,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Style="{StaticResource PageStyle}"
     mc:Ignorable="d">
-    <Grid x:ConnectionId='2' x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}"/>
+    <Grid x:ConnectionId='2' x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}">
+        <TextBox x:ConnectionId='3' x:Name="XPoint" HorizontalAlignment="Left" Margin="221,151,0,0" Text="Set the X point..." TextWrapping="Wrap" VerticalAlignment="Top" Height="47" Width="323" FontSize="24"/>
+        <TextBox x:ConnectionId='4' x:Name="YPoint" HorizontalAlignment="Left" Margin="221,237,0,0" Text="Set the Y point..." TextWrapping="Wrap" VerticalAlignment="Top" Height="47" Width="323" FontSize="24"/>
+        <TextBox x:ConnectionId='5' x:Name="ZPoint" HorizontalAlignment="Left" Margin="221,322,0,0" Text="Set the Z point..." TextWrapping="Wrap" VerticalAlignment="Top" Height="47" Width="323" FontSize="24"/>
+        <Button x:ConnectionId='6' x:Name="PointsButton" Content="Set" Margin="726,245,0,0" VerticalAlignment="Top" Height="39" Width="125"               FontSize="24"/>
+        <Popup>
+            <Grid Background="#FFE5E5E5"/>
+        </Popup>
+        <Popup>
+            <Grid Background="#FFE5E5E5"/>
+        </Popup>
+        <Slider x:ConnectionId='7' x:Name="DistancePicker" HorizontalAlignment="Center" Margin="0,646,0,0" VerticalAlignment="Top" Width="487" Minimum="1" Maximum="5" RenderTransformOrigin="0.5,0.5" Height="30" UseLayoutRounding="False" d:LayoutRounding="Auto" ManipulationMode="TranslateRailsX" Value="1"                                       >
+            <Slider.RenderTransform>
+                <CompositeTransform Rotation="0.002"/>
+            </Slider.RenderTransform>
+        </Slider>
+        <TextBox x:ConnectionId='8' x:Name="JustLabel" HorizontalAlignment="Center" Margin="0,565,0,0" Text="You can pick minimum distance from 1 to 5 m" TextWrapping="Wrap" VerticalAlignment="Top" Height="47" Width="505" FontSize="24" IsReadOnly="True"/>
+    </Grid>
 </Page>
 

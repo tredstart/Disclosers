@@ -9,7 +9,7 @@
     xmlns:model="using:Disclosers_Monitor.Core.Models"
     mc:Ignorable="d">
     <Grid x:Name="ContentArea" Margin="{StaticResource SmallLeftRightMargin}">
-        <TextBox x:Name="LengthBox" HorizontalAlignment="Left" Margin="56,486,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Height="79" Width="1389" FontSize="40" IsReadOnly="True" PlaceholderText="not working" Loaded="getLength"/>
+        <TextBox x:Name="LengthBox" HorizontalAlignment="Left" Margin="56,486,0,0" Text="Loading..." TextWrapping="Wrap" VerticalAlignment="Top" Height="79" Width="1389" FontSize="40" IsReadOnly="True" PlaceholderText="not working" Loaded="getLength" TextChanged="getLength"/>
 
 
     </Grid>
